@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<head>
+<title>
+</title>
+<script>
+    // Script goes here
+
+    const handleResponse = async (response, parseResponse) => {
+        const content = document.querySelector("#content");
+        console.log(response.status);
+
+        switch(response.status) {
+            case 200:
+                content.innerHTML = "Success<br>";
+                break;
+            case 400: 
+                content.innerHTML = "Bad request<br>";
+                break;
+            case 201: 
+                content.innerHTML = "Created";
+
+                break;
+        }
+
+        if (parseResponse && response.status === 200) {
+            let obj = await response.json();
+
+            if (obj.pokemons && obj.pokemons.length > 0) {
+                obj.pokemons.forEach(pokemon => {
+                    content.innerHTML += 
+                    `<div class="pokemon-card">
+                        <h3>${pokemon.name}</h3>
+                        <img src="${pokemon.img}" alt="${pokemon.name}" width="150">
+                    </div>`
+                })
+            }
+
+        } else if (response.status === 201) {
+            let obj = await response.json();
+            content.innerHTML += `
+            <div class="pokemon-card">
+                <h3>${obj.name} (${obj.id})</h3>
+                <img src="${obj.img}" alt="${obj.name}" width="150">
+            </div>
+            `
+        }else {
+            content.innerHTML += "Metadata received";
+        }
+    }
+
+    const requestUpdate = async (form) => {
+        const method = form.querySelector('input[name="method"]:checked').value; 
+        const input = form.querySelector("#userInput").value.trim();
+        const url = form.querySelector("#url").value;
+
+
+        console.log(input);
+
+        let newUrl = `${url}?query=${encodeURIComponent(input)}`; // Append query param
+
+        console.log(newUrl);
+
+        let response = await fetch(newUrl, {
+            method,
+            headers: {
+            "Accept": "application/json",
+            },
+        });
+
+        console.log(response.status);
+        handleResponse(response, method);
+    }
+
+    const sendPost = async (form) => {
+        const url = form.getAttribute("action");
+        const method = form.getAttribute("method");
+
+        const pokemonName = form.querySelector("#pokemon-name").value;
+        const imgURL = form.querySelector("#pokemon-image").value;
+        const pokemonID = form.querySelector("#pokemon-number").value;
+
+        const formData = `name=${pokemonName}&id=${pokemonID}&img=${imgURL}`;
+
+        let response = await fetch (url, {
+            method,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Accept: 'application/json'
+            },
+            body: formData,
+        })
+
+        handleResponse(response);
+    }
+
+    const sendTeamPost = async (form) => {
+        const url = form.getAttribute("action");
+        const method = form.getAttribute("method");
+
+        const pokemonName = form.querySelector("#pokemon-name").value;
+
+        let response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Accept: 'application/json'
+            },
+            body:`name=${encodeURIComponent(pokemonName)}`
+        });
+
+        handleResponse(response);
+    }
+
+    const init = () => {
+        const form = document.querySelector("#typeForm");
+        const post = document.querySelector("#postRequests");
+        const team = document.querySelector("#teamForm");
+
+        const getPokemonByType = (e) => {
+            e.preventDefault();
+            requestUpdate(form);
+            return false;
+        }
+
+        const addPokemon = (e) => {
+            e.preventDefault();
+            sendPost(post);
+            console.log('called');
+            return false;
+        }
+
+        const addPokemonToTeam = (e) => {
+            e.preventDefault();
+            sendTeamPost(team);
+            console.log('team called');
+            return false;
+        }
+
+        form.addEventListener('submit', getPokemonByType);
+        post.addEventListener('submit', addPokemon);
+        team.addEventListener('submit', addPokemonToTeam);
+    }
+
+    window.onload = init;
+</script>
+</head>
+<body>
+    <div class="endpoint">
+        <h2>
+            Project 1: Milestone
+        </h2>
+            <div class="mainContent">
+                <form id="typeForm">
+                    <select id="url">
+                        <option value="">--Please select an option--</option>
+                        <option value="/getPokemonByType">getPokemonByType</option>
+                        <option value="/getPokemonByName">getPokemonByName</option>
+                        <option value="/getPokemonById">getPokemonByID</option>
+                        <option value="/getPokemonByWeakness">getPokemonByWeakness</option>
+                    </select>
+                    <br>
+                    <label for="userInput">Input: </label>
+                    <input type="text" id="userInput"><br>
+                    <input type="radio" name="method" value="GET" checked> " GET"
+                    <input type="radio" name="method" value="HEAD"> " HEAD" <br>
+                    <input type="submit" value="Submit">
+                </form>
+                <h2>Add a pokemon!</h2>
+                <form id="postRequests" action="/addPokemon" method="post">
+                    <label for="pokemon-name">Name: </label>
+                    <input type="text" id="pokemon-name"><br>
+                    <label for="pokemon-number">Number: </label>
+                    <input type="number" id="pokemon-number"><br>
+                    <label for="pokemon-image">Image URL: </label>
+                    <input type="url" id="pokemon-image">
+                    <input type="submit" value="Submit">
+                </form>
+                <h2>Create your team</h2>
+                <form id="teamForm" action="/addPokemonToTeam" method="post">
+                    <label for="pokemon-name">Name: </label>
+                    <input type="text" id="pokemon-name"><br>
+                    <input type="submit" value="Add">
+                </form>
+            </div>
+            <div id="content"></div>
+    </div>
+</body>
+</html>
