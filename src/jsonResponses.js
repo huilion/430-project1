@@ -65,10 +65,17 @@ const addPokemonToTeam = (request, response) => {
   const foundPokemon = pokemons.find((p) => p.name.toLowerCase() === name.toLowerCase());
   pokemonTeam.push(foundPokemon);
 
-  console.log(foundPokemon);
-  console.log(pokemonTeam);
+  // If team already has 6 Pokémon, remove the first one
+  if (pokemonTeam.length > 6) {
+    pokemonTeam.shift(); // Remove the oldest Pokémon
+  }
 
-  return respondJSON(request, response, 201, foundPokemon);
+  console.log(foundPokemon);
+
+  return respondJSON(request, response, 201, {
+    message: `${foundPokemon.name} was added to your team!`,
+    team: pokemonTeam,
+  });
 };
 
 const getPokemonByParam = (request, response, param, input) => {

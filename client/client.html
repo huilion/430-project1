@@ -18,7 +18,6 @@
                 break;
             case 201: 
                 content.innerHTML = "Created";
-
                 break;
         }
 
@@ -42,7 +41,13 @@
                 <h3>${obj.name} (${obj.id})</h3>
                 <img src="${obj.img}" alt="${obj.name}" width="150">
             </div>
-            `
+            `;
+
+            // If team exists
+            if (obj.team) {
+                console.log(obj.team);
+                updateTeamList(obj.team);
+            }
         }else {
             content.innerHTML += "Metadata received";
         }
@@ -111,6 +116,16 @@
         handleResponse(response);
     }
 
+    const updateTeamList = (team) => {
+    const teamSection = document.querySelector("#content");
+    teamSection.innerHTML = "<h3>Current Team:</h3>";
+
+    team.forEach(pokemon => {
+        teamSection.innerHTML += `<p>${pokemon.name}</p><br><img src=${pokemon.img}>`;
+    });
+};
+
+
     const init = () => {
         const form = document.querySelector("#typeForm");
         const post = document.querySelector("#postRequests");
@@ -143,6 +158,7 @@
 
     window.onload = init;
 </script>
+<link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
     <div class="endpoint">
