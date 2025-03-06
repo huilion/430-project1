@@ -51,7 +51,6 @@ const addPokemon = (request, response) => {
       id,
       img,
     };
-    console.log(responseJSON);
 
     return respondJSON(request, response, responseCode, responseJSON);
   }
@@ -70,7 +69,6 @@ const addPokemonToTeam = (request, response) => {
     pokemonTeam.shift(); // Remove the oldest Pokémon
   }
 
-  console.log(foundPokemon);
 
   return respondJSON(request, response, 201, {
     message: `${foundPokemon.name} was added to your team!`,
@@ -83,13 +81,12 @@ const getPokemonByParam = (request, response, param, input) => {
     return respondJSON(request, response, 400, { message: `Missing ${param} parameter` });
   }
 
-  // Ensure pokemons is properly loaded
+    // Ensure pokemons is properly loaded
   const filteredPokemons = pokemons.filter((p) => {
-    // If the field is an array (e.g., type), check for inclusion
     if (Array.isArray(p[param])) {
       return p[param].map((val) => val.toLowerCase()).includes(input.toLowerCase());
     }
-    // Otherwise, compare directly (for name or id)
+    // Compare directly
     return String(p[param]).toLowerCase() === input.toLowerCase();
   });
 
@@ -115,7 +112,7 @@ const notFound = (request, response) => {
     id: 'notFound',
   };
 
-  respondJSON(request, response, 404, responseJSON);
+  return respondJSON(request, response, 404, responseJSON);
 };
 
 module.exports = {

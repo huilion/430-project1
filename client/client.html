@@ -19,6 +19,9 @@
             case 201: 
                 content.innerHTML = "Created";
                 break;
+            case 404: 
+                content.innerHTML = "Error 404, page isn't found";
+                break;
         }
 
         if (parseResponse && response.status === 200) {
@@ -45,11 +48,8 @@
 
             // If team exists
             if (obj.team) {
-                console.log(obj.team);
                 updateTeamList(obj.team);
             }
-        }else {
-            content.innerHTML += "Metadata received";
         }
     }
 
@@ -58,12 +58,7 @@
         const input = form.querySelector("#userInput").value.trim();
         const url = form.querySelector("#url").value;
 
-
-        console.log(input);
-
         let newUrl = `${url}?query=${encodeURIComponent(input)}`; // Append query param
-
-        console.log(newUrl);
 
         let response = await fetch(newUrl, {
             method,
@@ -72,7 +67,6 @@
             },
         });
 
-        console.log(response.status);
         handleResponse(response, method);
     }
 
@@ -121,7 +115,12 @@
     teamSection.innerHTML = "<h3>Current Team:</h3>";
 
     team.forEach(pokemon => {
-        teamSection.innerHTML += `<p>${pokemon.name}</p><br><img src=${pokemon.img}>`;
+        teamSection.innerHTML += `
+            <div class="pokemon-card">
+                <h3>${pokemon.name} (${pokemon.id})</h3>
+                <img src="${pokemon.img}" alt="${pokemon.name}" width="150">
+            </div>
+            `;;
     });
 };
 
@@ -140,14 +139,12 @@
         const addPokemon = (e) => {
             e.preventDefault();
             sendPost(post);
-            console.log('called');
             return false;
         }
 
         const addPokemonToTeam = (e) => {
             e.preventDefault();
             sendTeamPost(team);
-            console.log('team called');
             return false;
         }
 

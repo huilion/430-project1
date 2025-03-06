@@ -8,29 +8,27 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 const handleGet = (request, response, parsedURL) => {
   if (parsedURL.pathname === '/style.css') {
     htmlHandler.getCSS(request, response);
-  }
+  } else
   if (parsedURL.pathname === '/getPokemonByType') {
     const type = parsedURL.searchParams.get('query');
-    console.log(type);
     jsonHandler.getPokemonByParam(request, response, 'type', type);
-  }
+  } else
   if (parsedURL.pathname === '/getPokemonByName') {
     const name = parsedURL.searchParams.get('query');
-    console.log(name);
     jsonHandler.getPokemonByParam(request, response, 'name', name);
-  }
+  } else
   if (parsedURL.pathname === '/getPokemonById') {
     const id = parsedURL.searchParams.get('query');
-    console.log(id);
     jsonHandler.getPokemonByParam(request, response, 'id', id);
-  }
+  } else 
   if (parsedURL.pathname === '/getPokemonByWeakness') {
     const weakness = parsedURL.searchParams.get('query');
-    console.log(weakness);
     jsonHandler.getPokemonByParam(request, response, 'weaknesses', weakness);
-  }
+  } else 
   if (parsedURL.pathname === '/') {
     htmlHandler.getIndex(request, response);
+  } else {
+    jsonHandler.notFound(request, response);
   }
 };
 
